@@ -38,7 +38,20 @@ const generalLimiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per windowMs
 });
 
-app.use(cors());
+// CORS configuration to allow Vercel frontend
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://chat-viewer-drab.vercel.app',
+    'https://chat-viewer.vercel.app',
+    /\.vercel\.app$/  // Allow any Vercel subdomain
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(generalLimiter);
 
