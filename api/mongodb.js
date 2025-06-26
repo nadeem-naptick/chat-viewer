@@ -1,23 +1,27 @@
-const { MongoClient } = require('mongodb');
-const jwt = require('jsonwebtoken');
+import { MongoClient } from 'mongodb';
+import jwt from 'jsonwebtoken';
 
 let cachedClient = null;
+let cachedDb = null;
 
 async function connectToDatabase() {
-  if (cachedClient) {
-    return cachedClient;
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb };
   }
 
   const client = new MongoClient(process.env.MONGODB_URI, {
-    tls: true,
-    serverSelectionTimeoutMS: 30000,
-    connectTimeoutMS: 30000,
-    socketTimeoutMS: 30000
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
   });
 
   await client.connect();
+  const db = client.db(process.env.MONGODB_DATABASE_NAME || 'somnusuat');
+  
   cachedClient = client;
-  return client;
+  cachedDb = db;
+  
+  return { client, db };
 }
 
 // Authentication middleware
@@ -37,7 +41,7 @@ function authenticateToken(req) {
   }
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -60,9 +64,9 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const client = await connectToDatabase();
+    const { db } = await connectToDatabase();
     const { database = 'somnusuat', collection, action } = req.body;
-    const db = client.db(database);
+    const targetDb = database === 'somnusuat' ? db : db.client.db(database);
 
     switch (action) {
       case 'find':
@@ -70,7 +74,7 @@ module.exports = async function handler(req, res) {
         const findOptions = { sort, limit, skip };
         if (projection) findOptions.projection = projection;
         
-        const documents = await db.collection(collection)
+        const documents = await targetDb.collection(collection)
           .find(filter, findOptions)
           .toArray();
         res.json({ documents });
@@ -78,7 +82,7 @@ module.exports = async function handler(req, res) {
 
       case 'aggregate':
         const { pipeline } = req.body;
-        const aggregateResult = await db.collection(collection)
+        const aggregateResult = await targetDb.collection(collection)
           .aggregate(pipeline)
           .toArray();
         res.json({ documents: aggregateResult });
@@ -86,7 +90,7 @@ module.exports = async function handler(req, res) {
 
       case 'distinct':
         const { field } = req.body;
-        const distinctResult = await db.collection(collection)
+        const distinctResult = await targetDb.collection(collection)
           .distinct(field, req.body.filter || {});
         res.json({ values: distinctResult });
         break;
