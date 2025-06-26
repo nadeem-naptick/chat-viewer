@@ -123,13 +123,21 @@ const authenticateToken = (req, res, next) => {
 // Login endpoint with rate limiting
 app.post('/api/auth/login', loginLimiter, async (req, res) => {
   try {
+    console.log('Login attempt received');
+    console.log('Request body:', req.body);
+    
     const { password } = req.body;
     
     if (!password) {
+      console.log('No password provided');
       return res.status(400).json({ error: 'Password required' });
     }
 
+    console.log('Password provided, checking against admin password');
+    console.log('Admin password set:', !!ADMIN_PASSWORD);
+
     if (password === ADMIN_PASSWORD) {
+      console.log('Password correct, generating token');
       // Generate JWT token
       const token = jwt.sign(
         { userId: 'admin', role: 'admin' },
@@ -143,6 +151,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
         message: 'Authentication successful' 
       });
     } else {
+      console.log('Password incorrect');
       res.status(401).json({ 
         success: false, 
         error: 'Invalid password' 
