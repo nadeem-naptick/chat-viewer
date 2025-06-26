@@ -199,8 +199,10 @@ app.options('/api/auth/login', (req, res) => {
 
 app.post('/api/mongodb', authenticateToken, async (req, res) => {
   try {
+    console.log('MongoDB API called with action:', req.body.action);
     const client = await connectToDatabase();
     const { database = 'somnusuat', collection, action } = req.body;
+    console.log(`Database: ${database}, Collection: ${collection}, Action: ${action}`);
     const db = client.db(database);
 
     switch (action) {
@@ -234,7 +236,10 @@ app.post('/api/mongodb', authenticateToken, async (req, res) => {
         res.status(400).json({ error: 'Invalid action' });
     }
   } catch (error) {
-    console.error('MongoDB error:', error);
+    console.error('MongoDB API error:');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     res.status(500).json({ error: error.message });
   }
 });
