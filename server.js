@@ -59,6 +59,16 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(generalLimiter);
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    platform: process.env.RAILWAY_ENVIRONMENT ? 'railway' : 'other'
+  });
+});
+
 let cachedClient = null;
 
 // Authentication middleware
@@ -118,7 +128,14 @@ async function connectToDatabase() {
     return cachedClient;
   }
 
-  const client = new MongoClient(process.env.MONGODB_URI, {
+  const mongoUri = process.env.MONGODB_URI;
+  if (!mongoUri) {
+    console.error('❌ MONGODB_URI environment variable is not set!');
+    throw new Error('MONGODB_URI is required');
+  }
+
+  console.log('Connecting to MongoDB...');
+  const client = new MongoClient(mongoUri, {
     tls: true,
     serverSelectionTimeoutMS: 30000,
     connectTimeoutMS: 30000,
@@ -126,6 +143,7 @@ async function connectToDatabase() {
   });
 
   await client.connect();
+  console.log('✅ Connected to MongoDB successfully');
   cachedClient = client;
   return client;
 }
