@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { User as UserType, ChatHistory } from '../types/chat';
 
-// Use local API endpoint for development, Vercel API for production
-const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api/mongodb' : '/api/mongodb';
+// Use Railway backend for production, local for development
+const API_URL = import.meta.env.DEV ? 'http://localhost:3001/api/mongodb' : 'https://web-production-39528.up.railway.app/api/mongodb';
 
 // Allow dynamic database selection
 export const getDatabase = () => {
