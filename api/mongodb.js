@@ -1,5 +1,5 @@
-import { MongoClient } from 'mongodb';
-import jwt from 'jsonwebtoken';
+const { MongoClient } = require('mongodb');
+const jwt = require('jsonwebtoken');
 
 let cachedClient = null;
 
@@ -37,7 +37,7 @@ function authenticateToken(req) {
   }
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
