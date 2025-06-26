@@ -21,8 +21,13 @@ function SimpleApp() {
   const [authToken, setAuthToken] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
 
-  const API_URL = 'http://localhost:3001/api/mongodb';
-  const AUTH_URL = 'http://localhost:3001/api/auth/login';
+  // API URLs that work in both development and production
+  const API_BASE = import.meta.env.PROD 
+    ? '' // Use relative URLs in production (same domain)
+    : 'http://localhost:3001'; // Use localhost in development
+    
+  const API_URL = `${API_BASE}/api/mongodb`;
+  const AUTH_URL = `${API_BASE}/api/auth/login`;
 
   // Helper function to get auth headers
   const getAuthHeaders = () => {
