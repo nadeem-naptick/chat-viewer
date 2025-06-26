@@ -23,9 +23,16 @@ function SimpleApp() {
 
   // API URLs that work in both development and production
   const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-  const API_BASE = isProduction 
-    ? '' // Use relative URLs in production (same domain)
-    : 'http://localhost:3001'; // Use localhost in development
+  const isVercel = window.location.hostname.includes('vercel.app');
+  
+  let API_BASE;
+  if (!isProduction) {
+    API_BASE = 'http://localhost:3001'; // Development
+  } else if (isVercel) {
+    API_BASE = ''; // Vercel (relative URLs)
+  } else {
+    API_BASE = ''; // Railway/Render (same domain)
+  }
     
   const API_URL = `${API_BASE}/api/mongodb`;
   const AUTH_URL = `${API_BASE}/api/auth/login`;

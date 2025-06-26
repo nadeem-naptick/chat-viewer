@@ -9,7 +9,7 @@ import rateLimit from 'express-rate-limit';
 dotenv.config();
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Secure authentication configuration from environment variables
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
