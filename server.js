@@ -65,8 +65,14 @@ app.get('/health', (req, res) => {
     status: 'ok', 
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    platform: process.env.RAILWAY_ENVIRONMENT ? 'railway' : 'other'
+    platform: process.env.RAILWAY_ENVIRONMENT ? 'railway' : 'other',
+    version: '2025-06-26-v4' // To verify deployment
   });
+});
+
+// Test OPTIONS endpoint
+app.get('/test-options', (req, res) => {
+  res.json({ message: 'OPTIONS test endpoint - if you see this, server is running latest code' });
 });
 
 // CORS preflight handler - use middleware approach only
