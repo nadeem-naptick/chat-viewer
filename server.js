@@ -161,6 +161,15 @@ async function connectToDatabase() {
   return client;
 }
 
+// Handle OPTIONS for the exact route that's failing
+app.options('/api/mongodb', (req, res) => {
+  res.sendStatus(200);
+});
+
+app.options('/api/auth/login', (req, res) => {
+  res.sendStatus(200);
+});
+
 app.post('/api/mongodb', authenticateToken, async (req, res) => {
   try {
     const client = await connectToDatabase();
