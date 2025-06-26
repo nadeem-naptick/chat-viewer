@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
+import jwt from 'jsonwebtoken';
 
-// This will work as a Vercel serverless function
 let cachedClient = null;
 
 async function connectToDatabase() {
@@ -20,15 +20,33 @@ async function connectToDatabase() {
   return client;
 }
 
-export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+// Authentication middleware
+function authenticateToken(req) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+  if (!token) {
+    return { error: 'Access token required', status: 401 };
+  }
+
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    return { user };
+  } catch (err) {
+    return { error: 'Invalid or expired token', status: 403 };
+  }
+}
+
+export default async function handler(req, res) {
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Check authentication
+  const authResult = authenticateToken(req);
+  if (authResult.error) {
+    return res.status(authResult.status).json({ error: authResult.error });
   }
 
   try {
@@ -38,12 +56,12 @@ export default async function handler(req, res) {
 
     switch (action) {
       case 'find':
-        const { filter = {}, sort = {}, limit = 50, skip = 0 } = req.body;
+        const { filter = {}, sort = {}, limit = 50, skip = 0, projection } = req.body;
+        const findOptions = { sort, limit, skip };
+        if (projection) findOptions.projection = projection;
+        
         const documents = await db.collection(collection)
-          .find(filter)
-          .sort(sort)
-          .limit(limit)
-          .skip(skip)
+          .find(filter, findOptions)
           .toArray();
         res.json({ documents });
         break;
