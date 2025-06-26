@@ -32,9 +32,9 @@ function SimpleApp() {
   } else if (isRailway) {
     API_BASE = ''; // Railway (same domain)
   } else {
-    // Vercel frontend should call Railway backend
-    // This ensures Vercel deployment uses Railway backend instead of broken Vercel functions
-    API_BASE = 'https://chat-viewer-production.up.railway.app'; 
+    // Vercel frontend should call Render backend
+    // Render has static IPs and better MongoDB Atlas compatibility
+    API_BASE = 'https://chat-viewer.onrender.com'; 
   }
     
   const API_URL = `${API_BASE}/api/mongodb`;
