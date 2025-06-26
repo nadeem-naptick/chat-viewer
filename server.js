@@ -190,10 +190,41 @@ app.post('/api/mongodb', authenticateToken, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`API server running on port ${PORT}`);
+// Start server with proper host binding for Railway
+const HOST = '0.0.0.0'; // Required for Railway
+const server = app.listen(PORT, HOST, () => {
+  console.log(`API server running on http://${HOST}:${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   if (process.env.RAILWAY_ENVIRONMENT) {
     console.log('Running on Railway platform');
   }
+  console.log('Environment variables status:');
+  console.log(`- MONGODB_URI: ${process.env.MONGODB_URI ? '✅ Set' : '❌ Missing'}`);
+  console.log(`- ADMIN_PASSWORD: ${process.env.ADMIN_PASSWORD ? '✅ Set' : '❌ Missing'}`);
+  console.log(`- JWT_SECRET: ${process.env.JWT_SECRET ? '✅ Set' : '❌ Missing'}`);
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed');
+    if (cachedClient) {
+      cachedClient.close();
+      console.log('MongoDB connection closed');
+    }
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed');
+    if (cachedClient) {
+      cachedClient.close();
+      console.log('MongoDB connection closed');
+    }
+    process.exit(0);
+  });
 });
