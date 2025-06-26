@@ -33,6 +33,7 @@ function SimpleApp() {
     API_BASE = ''; // Railway (same domain)
   } else {
     // Vercel frontend should call Railway backend
+    // This ensures Vercel deployment uses Railway backend instead of broken Vercel functions
     API_BASE = 'https://web-production-39528.up.railway.app'; 
   }
     
