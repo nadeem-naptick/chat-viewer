@@ -22,12 +22,17 @@ function SimpleApp() {
   const [authLoading, setAuthLoading] = useState(false);
 
   // API URLs that work in both development and production
-  const API_BASE = import.meta.env.PROD 
+  const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+  const API_BASE = isProduction 
     ? '' // Use relative URLs in production (same domain)
     : 'http://localhost:3001'; // Use localhost in development
     
   const API_URL = `${API_BASE}/api/mongodb`;
   const AUTH_URL = `${API_BASE}/api/auth/login`;
+  
+  console.log('Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
+  console.log('API_URL:', API_URL);
+  console.log('AUTH_URL:', AUTH_URL);
 
   // Helper function to get auth headers
   const getAuthHeaders = () => {
