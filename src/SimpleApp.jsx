@@ -631,6 +631,9 @@ function SimpleApp() {
           <div style={{ marginTop: '20px', fontSize: '12px', color: '#999' }}>
             This application contains sensitive production data
           </div>
+          <div style={{ marginTop: '10px', fontSize: '10px', color: '#ccc' }}>
+            v1.0.1 - Production Ready
+          </div>
         </div>
       </div>
     );
