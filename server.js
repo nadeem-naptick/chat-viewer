@@ -11,6 +11,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy for Railway/Vercel deployment
+app.set('trust proxy', 1);
+
 // Secure authentication configuration from environment variables
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -169,5 +172,9 @@ app.post('/api/mongodb', authenticateToken, async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Development API server running on http://localhost:${PORT}`);
+  console.log(`API server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  if (process.env.RAILWAY_ENVIRONMENT) {
+    console.log('Running on Railway platform');
+  }
 });
