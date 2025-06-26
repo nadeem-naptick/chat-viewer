@@ -31,8 +31,8 @@ if (!ADMIN_PASSWORD || !JWT_SECRET) {
 
 // Rate limiting for login attempts
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 login requests per windowMs
+  windowMs: 2 * 60 * 1000, // 2 minutes (reduced for testing)
+  max: 20, // Increased limit for testing
   message: {
     error: 'Too many login attempts. Please try again in 15 minutes.'
   },
