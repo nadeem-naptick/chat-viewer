@@ -24,14 +24,16 @@ function SimpleApp() {
   // API URLs that work in both development and production
   const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
   const isVercel = window.location.hostname.includes('vercel.app');
+  const isRailway = window.location.hostname.includes('railway.app');
   
   let API_BASE;
   if (!isProduction) {
     API_BASE = 'http://localhost:3001'; // Development
-  } else if (isVercel) {
-    API_BASE = ''; // Vercel (relative URLs)
+  } else if (isRailway) {
+    API_BASE = ''; // Railway (same domain)
   } else {
-    API_BASE = ''; // Railway/Render (same domain)
+    // Vercel frontend should call Railway backend
+    API_BASE = 'https://web-production-39528.up.railway.app'; 
   }
     
   const API_URL = `${API_BASE}/api/mongodb`;
