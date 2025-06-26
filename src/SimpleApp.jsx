@@ -34,7 +34,7 @@ function SimpleApp() {
   } else {
     // Vercel frontend should call Railway backend
     // This ensures Vercel deployment uses Railway backend instead of broken Vercel functions
-    API_BASE = 'https://web-production-39528.up.railway.app'; 
+    API_BASE = 'https://chat-viewer-production.up.railway.app'; 
   }
     
   const API_URL = `${API_BASE}/api/mongodb`;
