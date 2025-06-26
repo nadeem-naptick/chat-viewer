@@ -11,6 +11,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Log the port being used
+console.log('PORT environment variable:', process.env.PORT);
+console.log('Using port:', PORT);
+
 // Trust proxy for Railway/Vercel deployment - REQUIRED for Railway
 // This fixes the X-Forwarded-For header error
 app.set('trust proxy', 1);
